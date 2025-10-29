@@ -1,107 +1,151 @@
+// Select elements
 const taskInput = document.getElementById("taskInput");
-const addBtn = document.getElementById("addBtn");
+const addTaskBtn = document.getElementById("addTaskBtn");
 const taskList = document.getElementById("taskList");
+const errorMsg = document.querySelector(".error-msg");
+const filterButtons = document.querySelectorAll(".filter-btn");
+const searchInput = document.getElementById("searchInput");
+const taskCounter = document.querySelector(".task-counter");
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let currentFilter = "all";
 
-function saveTasks() {
+// 🧩 Render Tasks
+function renderTasks() {
+  taskList.innerHTML = "";
+  const filteredTasks = getFilteredTasks();
+  const searchTerm = searchInput.value.toLowerCase();
+
+  const visibleTasks = filteredTasks.filter(task =>
+    task.text.toLowerCase().includes(searchTerm)
+  );
+
+  visibleTasks.forEach((task, index) => {
+    const li = document.createElement("li");
+    if (task.completed) li.classList.add("completed");
+
+    li.innerHTML = `
+      <span class="check-icon" onclick="toggleTask(${index})">
+        ${task.completed ? "✔️" : "⬜"}
+      </span>
+      <span class="task-text" contenteditable="false">${task.text}</span>
+      <div class="actions">
+        <button class="edit-btn" onclick="editTask(${index})">Edit</button>
+        <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
+      </div>
+    `;
+
+    taskList.appendChild(li);
+  });
+
+  updateCounter();
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-function showTasks() {
-  taskList.innerHTML = ""; 
+// 🧮 Update Task Counter
+function updateCounter() {
+  const total = tasks.length;
+  const completed = tasks.filter(t => t.completed).length;
+  taskCounter.textContent = `Total: ${total} | Completed: ${completed}`;
+}
 
-  for (let i = 0; i < tasks.length; i++) {
-    const task = tasks[i];
+// 🟢 Add Task
+addTaskBtn.addEventListener("click", () => {
+  const text = taskInput.value.trim();
 
-    const li = document.createElement("li");
-    if (task.completed) {
-      li.classList.add("completed");
-    }
-
-    const check = document.createElement("span");
-    check.className = "material-icons check-icon";
-    check.textContent = "check_circle";
-    check.onclick = function () {
-      toggleComplete(i);
-    };
-
-    const text = document.createElement("span");
-    text.className = "task-text";
-    text.textContent = task.text;
-
-    const actions = document.createElement("div");
-    actions.className = "actions";
-
-    const editBtn = document.createElement("button");
-    editBtn.className = "edit-btn";
-    editBtn.textContent = "Edit";
-    editBtn.onclick = function () {
-      editTask(text, i, editBtn);
-    };
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "delete-btn";
-    deleteBtn.textContent = "Delete";
-    deleteBtn.onclick = function () {
-      deleteTask(i);
-    };
-
-    actions.appendChild(editBtn);
-    actions.appendChild(deleteBtn);
-    li.appendChild(check);
-    li.appendChild(text);
-    li.appendChild(actions);
-    taskList.appendChild(li);
+  if (!text) {
+    showError("Task cannot be empty!");
+    return;
   }
-}
 
-function addTask() {
-  const newTask = taskInput.value;
-  if (newTask === "" || newTask === " ") {
-    return; 
+  if (tasks.some(task => task.text.toLowerCase() === text.toLowerCase())) {
+    showError("Duplicate task not allowed!");
+    return;
   }
-  tasks.push({ text: newTask, completed: false });
-  saveTasks();
-  showTasks();
-  taskInput.value = ""; 
-}
 
-function toggleComplete(index) {
-  tasks[index].completed = !tasks[index].completed;
-  saveTasks();
-  showTasks();
-}
-
-function deleteTask(index) {
-  tasks.splice(index, 1);
-  saveTasks();
-  showTasks();
-}
-
-function editTask(textElement, index, editButton) {
-  textElement.contentEditable = true;
-  textElement.classList.add("editable");
-  textElement.focus();
-
-  editButton.textContent = "Save";
-  editButton.style.backgroundColor = "#28a745";
-  editButton.style.color = "white";
-
-  editButton.onclick = function () {
-    textElement.contentEditable = false;
-    textElement.classList.remove("editable");
-    tasks[index].text = textElement.textContent;
-    saveTasks();
-    showTasks();
-  };
-}
-
-addBtn.addEventListener("click", addTask);
-taskInput.addEventListener("keypress", function (event) {
-  if (event.key === "Enter") {
-    addTask();
-  }
+  tasks.push({ text, completed: false });
+  taskInput.value = "";
+  hideError();
+  renderTasks();
 });
 
-showTasks();
+// ⚙️ Edit Task
+function editTask(index) {
+  const li = taskList.children[index];
+  const textSpan = li.querySelector(".task-text");
+
+  if (textSpan.isContentEditable) {
+    const newText = textSpan.textContent.trim();
+
+    if (!newText) {
+      showError("Task cannot be empty!");
+      return;
+    }
+
+    if (
+      tasks.some(
+        (task, i) =>
+          i !== index && task.text.toLowerCase() === newText.toLowerCase()
+      )
+    ) {
+      showError("Duplicate task not allowed!");
+      return;
+    }
+
+    tasks[index].text = newText;
+    textSpan.contentEditable = false;
+    textSpan.classList.remove("editable");
+    hideError();
+    renderTasks();
+  } else {
+    textSpan.contentEditable = true;
+    textSpan.classList.add("editable");
+    textSpan.focus();
+  }
+}
+
+// 🗑️ Delete Task
+function deleteTask(index) {
+  tasks.splice(index, 1);
+  renderTasks();
+}
+
+// ✅ Toggle Completion
+function toggleTask(index) {
+  tasks[index].completed = !tasks[index].completed;
+  renderTasks();
+}
+
+// 🧭 Filtering
+filterButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    filterButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.dataset.filter;
+    renderTasks();
+  });
+});
+
+function getFilteredTasks() {
+  if (currentFilter === "completed")
+    return tasks.filter(task => task.completed);
+  if (currentFilter === "pending")
+    return tasks.filter(task => !task.completed);
+  return tasks;
+}
+
+// 🔍 Live Search
+searchInput.addEventListener("input", renderTasks);
+
+// ⚠️ Error Handling
+function showError(message) {
+  errorMsg.textContent = message;
+  errorMsg.style.display = "block";
+}
+
+function hideError() {
+  errorMsg.style.display = "none";
+}
+
+// 💾 Initial Render
+renderTasks();
