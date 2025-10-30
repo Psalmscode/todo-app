@@ -8,22 +8,47 @@ my-todo-app/
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple To-Do List App</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced To-Do List</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <div class="todo-container">
-        <h1>To-Do List 📝</h1>
-        <div class="input-area">
-            <input type="text" id="taskInput" placeholder="Enter a new task...">
-            <button id="addBtn">Add</button>
-        </div>
-        <ul id="taskList"></ul>
+  <div class="todo-container">
+    <h1>To-Do List 📝</h1>
+
+    <!-- ✅ Error message for empty or duplicate tasks -->
+    <p id="errorMsg" class="error-msg"></p>
+
+    <!-- 🧠 Search bar for finding tasks -->
+    <div class="search-area">
+      <input type="text" id="searchInput" placeholder="Search tasks...">
     </div>
 
-    <script src="script.js"></script>
+    <!-- 🧭 Filter buttons: All / Completed / Pending -->
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="completed">Completed</button>
+      <button class="filter-btn" data-filter="pending">Pending</button>
+    </div>
+
+    <!-- ✍️ Task input -->
+    <div class="input-area">
+      <input type="text" id="taskInput" placeholder="Enter a new task...">
+      <button id="addTaskBtn">Add</button>
+    </div>
+
+    <!-- 📋 Task list -->
+    <ul id="taskList"></ul>
+
+    <!-- 🔢 Task counter -->
+    <div class="task-counter">
+      <p>Total: <span id="totalCount">0</span> | Completed: <span id="completedCount">0</span></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
+

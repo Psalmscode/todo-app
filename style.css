@@ -1,3 +1,4 @@
+/* ✅ Reset and body styling */
 * {
   margin: 0;
   padding: 0;
@@ -6,7 +7,7 @@
 
 body {
   font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, #076655, #acb6e5);
+  background: linear-gradient(135deg, #0d6efd, #89c2ff);
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -14,6 +15,7 @@ body {
   padding: 20px;
 }
 
+/* 🧱 Main container */
 .todo-container {
   background: #fff;
   padding: 25px 20px;
@@ -23,6 +25,7 @@ body {
   max-width: 420px;
 }
 
+/* 🧩 Title */
 h1 {
   text-align: center;
   color: #333;
@@ -30,6 +33,57 @@ h1 {
   font-weight: 600;
 }
 
+/* ⚠️ Error Message */
+.error-msg {
+  color: #dc3545;
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 10px;
+  display: none;
+}
+
+/* 🔍 Search bar */
+.search-area {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* 🧭 Filter Buttons */
+.filter-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.filter-btn {
+  flex: 1;
+  background: #e0e7ff;
+  border: none;
+  padding: 8px 0;
+  margin: 0 5px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #0d47a1;
+  transition: background 0.3s, color 0.3s;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  background: #0d6efd;
+  color: #fff;
+}
+
+/* 📝 Input area */
 .input-area {
   display: flex;
   gap: 10px;
@@ -59,6 +113,7 @@ button:hover {
   background-color: #0056b3;
 }
 
+/* 📋 Task list */
 ul {
   list-style: none;
 }
@@ -79,6 +134,7 @@ li.completed .task-text {
   color: #999;
 }
 
+/* ✅ Icons and buttons */
 .check-icon {
   cursor: pointer;
   color: #007bff;
@@ -142,6 +198,15 @@ li.completed .check-icon {
   padding: 2px 6px;
 }
 
+/* 🔢 Task counter */
+.task-counter {
+  text-align: center;
+  margin-top: 10px;
+  color: #333;
+  font-size: 15px;
+}
+
+/* 📱 Responsive Design */
 @media (max-width: 480px) {
   .todo-container {
     padding: 20px 15px;
@@ -162,4 +227,14 @@ li.completed .check-icon {
     width: 48%;
     text-align: center;
   }
+
+  .filter-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .filter-btn {
+    width: 100%;
+  }
 }
+
