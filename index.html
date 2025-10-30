@@ -10,7 +10,7 @@ my-todo-app/
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enhanced To-Do List</title>
+  <title>To-Do List</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
@@ -18,7 +18,12 @@ my-todo-app/
   <div class="todo-container">
     <h1>To-Do List 📝</h1>
 
-    <p id="errorMsg" class="error-msg"></p>
+    <div class="input-area">
+      <input type="text" id="taskInput" placeholder="Enter a new task...">
+      <button id="addTaskBtn">Add</button>
+    </div>
+
+    <small id="errorMsg" class="error-msg"></small>
 
     <div class="search-area">
       <input type="text" id="searchInput" placeholder="Search tasks...">
@@ -28,11 +33,6 @@ my-todo-app/
       <button class="filter-btn active" data-filter="all">All</button>
       <button class="filter-btn" data-filter="completed">Completed</button>
       <button class="filter-btn" data-filter="pending">Pending</button>
-    </div>
-
-    <div class="input-area">
-      <input type="text" id="taskInput" placeholder="Enter a new task...">
-      <button id="addTaskBtn">Add</button>
     </div>
 
     <ul id="taskList"></ul>
