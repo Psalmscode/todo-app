@@ -1,151 +1,138 @@
-// Select elements
 const taskInput = document.getElementById("taskInput");
-const addTaskBtn = document.getElementById("addTaskBtn");
+const addBtn = document.getElementById("addBtn");
 const taskList = document.getElementById("taskList");
-const errorMsg = document.querySelector(".error-msg");
-const filterButtons = document.querySelectorAll(".filter-btn");
+const errorMsg = document.getElementById("errorMsg");
 const searchInput = document.getElementById("searchInput");
-const taskCounter = document.querySelector(".task-counter");
+const filterButtons = document.querySelectorAll(".filter-btn");
+const totalCount = document.getElementById("totalCount");
+const completedCount = document.getElementById("completedCount");
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let currentFilter = "all";
 
-// 🧩 Render Tasks
-function renderTasks() {
-  taskList.innerHTML = "";
-  const filteredTasks = getFilteredTasks();
-  const searchTerm = searchInput.value.toLowerCase();
-
-  const visibleTasks = filteredTasks.filter(task =>
-    task.text.toLowerCase().includes(searchTerm)
-  );
-
-  visibleTasks.forEach((task, index) => {
-    const li = document.createElement("li");
-    if (task.completed) li.classList.add("completed");
-
-    li.innerHTML = `
-      <span class="check-icon" onclick="toggleTask(${index})">
-        ${task.completed ? "✔️" : "⬜"}
-      </span>
-      <span class="task-text" contenteditable="false">${task.text}</span>
-      <div class="actions">
-        <button class="edit-btn" onclick="editTask(${index})">Edit</button>
-        <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
-      </div>
-    `;
-
-    taskList.appendChild(li);
-  });
-
-  updateCounter();
+function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-// 🧮 Update Task Counter
-function updateCounter() {
-  const total = tasks.length;
-  const completed = tasks.filter(t => t.completed).length;
-  taskCounter.textContent = `Total: ${total} | Completed: ${completed}`;
+function showTasks() {
+  taskList.innerHTML = "";
+  let filteredTasks = tasks.filter(task => {
+    if (currentFilter === "completed") return task.completed;
+    if (currentFilter === "pending") return !task.completed;
+    return true;
+  });
+
+  const searchTerm = searchInput.value.toLowerCase();
+  filteredTasks = filteredTasks.filter(task =>
+    task.text.toLowerCase().includes(searchTerm)
+  );
+
+  filteredTasks.forEach((task, i) => {
+    const li = document.createElement("li");
+    if (task.completed) li.classList.add("completed");
+
+    const check = document.createElement("span");
+    check.className = "material-icons check-icon";
+    check.textContent = "check_circle";
+    check.onclick = () => toggleComplete(i);
+
+    const text = document.createElement("span");
+    text.className = "task-text";
+    text.textContent = task.text;
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "edit-btn";
+    editBtn.textContent = "Edit";
+    editBtn.onclick = () => editTask(text, i, editBtn);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.onclick = () => deleteTask(i);
+
+    actions.append(editBtn, deleteBtn);
+    li.append(check, text, actions);
+    taskList.appendChild(li);
+  });
+
+  updateCounters();
 }
 
-// 🟢 Add Task
-addTaskBtn.addEventListener("click", () => {
-  const text = taskInput.value.trim();
+function addTask() {
+  const newTask = taskInput.value.trim();
+  errorMsg.textContent = "";
 
-  if (!text) {
-    showError("Task cannot be empty!");
+  if (!newTask) {
+    errorMsg.textContent = "Task cannot be empty!";
+    return;
+  }
+  if (tasks.some(t => t.text.toLowerCase() === newTask.toLowerCase())) {
+    errorMsg.textContent = "Task already exists!";
     return;
   }
 
-  if (tasks.some(task => task.text.toLowerCase() === text.toLowerCase())) {
-    showError("Duplicate task not allowed!");
-    return;
-  }
-
-  tasks.push({ text, completed: false });
+  tasks.push({ text: newTask, completed: false });
+  saveTasks();
+  showTasks();
   taskInput.value = "";
-  hideError();
-  renderTasks();
-});
-
-// ⚙️ Edit Task
-function editTask(index) {
-  const li = taskList.children[index];
-  const textSpan = li.querySelector(".task-text");
-
-  if (textSpan.isContentEditable) {
-    const newText = textSpan.textContent.trim();
-
-    if (!newText) {
-      showError("Task cannot be empty!");
-      return;
-    }
-
-    if (
-      tasks.some(
-        (task, i) =>
-          i !== index && task.text.toLowerCase() === newText.toLowerCase()
-      )
-    ) {
-      showError("Duplicate task not allowed!");
-      return;
-    }
-
-    tasks[index].text = newText;
-    textSpan.contentEditable = false;
-    textSpan.classList.remove("editable");
-    hideError();
-    renderTasks();
-  } else {
-    textSpan.contentEditable = true;
-    textSpan.classList.add("editable");
-    textSpan.focus();
-  }
 }
 
-// 🗑️ Delete Task
+function toggleComplete(index) {
+  tasks[index].completed = !tasks[index].completed;
+  saveTasks();
+  showTasks();
+}
+
 function deleteTask(index) {
   tasks.splice(index, 1);
-  renderTasks();
+  saveTasks();
+  showTasks();
 }
 
-// ✅ Toggle Completion
-function toggleTask(index) {
-  tasks[index].completed = !tasks[index].completed;
-  renderTasks();
+function editTask(textElement, index, editButton) {
+  textElement.contentEditable = true;
+  textElement.classList.add("editable");
+  textElement.focus();
+
+  editButton.textContent = "Save";
+  editButton.style.backgroundColor = "#28a745";
+  editButton.style.color = "white";
+
+  editButton.onclick = function () {
+    const updatedText = textElement.textContent.trim();
+    if (!updatedText) {
+      errorMsg.textContent = "Task cannot be empty!";
+      return;
+    }
+    tasks[index].text = updatedText;
+    saveTasks();
+    showTasks();
+  };
 }
 
-// 🧭 Filtering
+function updateCounters() {
+  totalCount.textContent = tasks.length;
+  completedCount.textContent = tasks.filter(t => t.completed).length;
+}
+
 filterButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     filterButtons.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     currentFilter = btn.dataset.filter;
-    renderTasks();
+    showTasks();
   });
 });
 
-function getFilteredTasks() {
-  if (currentFilter === "completed")
-    return tasks.filter(task => task.completed);
-  if (currentFilter === "pending")
-    return tasks.filter(task => !task.completed);
-  return tasks;
-}
+searchInput.addEventListener("input", showTasks);
 
-// 🔍 Live Search
-searchInput.addEventListener("input", renderTasks);
+taskInput.addEventListener("keypress", e => {
+  if (e.key === "Enter") addTask();
+});
 
-// ⚠️ Error Handling
-function showError(message) {
-  errorMsg.textContent = message;
-  errorMsg.style.display = "block";
-}
+addBtn.addEventListener("click", addTask);
 
-function hideError() {
-  errorMsg.style.display = "none";
-}
-
-// 💾 Initial Render
-renderTasks();
+showTasks();
