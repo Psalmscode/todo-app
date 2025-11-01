@@ -30,10 +30,57 @@ h1 {
   font-weight: 600;
 }
 
-.input-area, .search-area {
+.error-msg {
+  color: rgb(255, 0, 0);
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.search-area {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.filter-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.filter-btn {
+  flex: 1;
+  background: #e0e7ff;
+  border: none;
+  padding: 8px 0;
+  margin: 0 5px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #0d47a1;
+  transition: background 0.3s, color 0.3s;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  background: #0d6efd;
+  color: #fff;
+}
+
+.input-area {
   display: flex;
   gap: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 input {
@@ -57,51 +104,6 @@ button {
 
 button:hover {
   background-color: #0056b3;
-}
-
-.filter-area {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.filter-btn.go {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #ffc107;
-  color: #fff;
-  transition: 0.3s;
-}
-
-.filter-btn.go:hover {
-  background: #e0a800;
-}
-
-.filter-btn.wait {
-  background: #dc3545;
-  color: #fff;
-}  
-
-.filter-btn.wait:hover {
-  background: #b02a37;
-}
-
-.filter-btn.active {
-  background: #007bff;
-  color: #fff;
-}
-
-.filter-btn.active:hover {
-  background: #0056b3;
-}
-
-.task-counter {
-  text-align: center;
-  margin-bottom: 10px;
-  color: #333;
 }
 
 ul {
@@ -187,15 +189,18 @@ li.completed .check-icon {
   padding: 2px 6px;
 }
 
-.error-msg {
-  color: red;
-  font-size: 13px;
-  margin-bottom: 10px;
-  display: block;
+.task-counter {
   text-align: center;
+  margin-top: 10px;
+  color: #333;
+  font-size: 15px;
 }
 
 @media (max-width: 480px) {
+  .todo-container {
+    padding: 20px 15px;
+  }
+
   li {
     flex-direction: column;
     align-items: flex-start;
@@ -209,6 +214,16 @@ li.completed .check-icon {
 
   .actions button {
     width: 48%;
+    text-align: center;
+  }
+
+  .filter-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .filter-btn {
+    width: 100%;
   }
 }
 
